@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ToDo List</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <!-- Sayfa basligiyla birlikte ayarlar butonunu sag ustte konumlandirir. madeByCodex -->
+    <header class="site-header">
+      <h1>My Tasks</h1>
+      <button
+        type="button"
+        class="settings-button"
+        id="settingsButton"
+        aria-label="Open settings"
+        aria-controls="settingsPanel"
+        aria-expanded="false"
+        title="Settings"
+      >
+        <i class="bi bi-gear" aria-hidden="true"></i>
+      </button>
+    </header>
+
+    <!-- Panel acikken arka plani kaplayarak disariya tiklamayla kapanmayi saglar. madeByCodex -->
+    <div class="settings-overlay" id="settingsOverlay"></div>
+
+    <!-- Ayar seceneklerini sagdan sola kayan kompakt panel icinde sunar. madeByCodex -->
+    <aside
+      class="settings-panel"
+      id="settingsPanel"
+      aria-label="Settings"
+      aria-hidden="true"
+    >
+      <div class="settings-panel-header">
+        <h2>Settings</h2>
+        <button
+          type="button"
+          class="close-settings-button"
+          id="closeSettingsButton"
+          aria-label="Close settings"
+          title="Close settings"
+        >
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
+      <!-- Kullaniciya gorev tasima yontemlerinden birini renkli switch gorunumuyle secmesini saglar. madeByCodex -->
+      <fieldset class="mode-settings">
+        <legend>Task movement</legend>
+        <label class="mode-option">
+          <input type="radio" name="interactionMode" value="buttons" checked />
+          <span class="mode-option-content">
+            <i class="bi bi-ui-checks-grid" aria-hidden="true"></i>
+            <span>Buttons</span>
+          </span>
+        </label>
+        <label class="mode-option">
+          <input type="radio" name="interactionMode" value="dragdrop" />
+          <span class="mode-option-content">
+            <i class="bi bi-hand-index" aria-hidden="true"></i>
+            <span>Drag &amp; Drop</span>
+          </span>
+        </label>
+      </fieldset>
+
+      <!-- Kullaniciya gorev odaklanma efektini acip kapatma secenegi verir. madeByCodex -->
+      <div class="focus-setting">
+        <div class="focus-setting-copy">
+          <i class="bi bi-crosshair2" aria-hidden="true"></i>
+          <span>Focus effect</span>
+        </div>
+        <label class="toggle-control">
+          <input type="checkbox" id="focusModeToggle" checked />
+          <span class="toggle-slider" aria-hidden="true"></span>
+          <span class="visually-hidden">Toggle focus effect</span>
+        </label>
+      </div>
+    </aside>
+
+    <!-- Gorev ekleme kismi -->
+    <div class="form-container">
+      <form class="addTodoMission" id="todoForm">
+        <label for="addMission">Add a new mission:</label>
+
+        <input
+          type="text"
+          id="addMission"
+          placeholder="Add new mission!!!"
+          autocomplete="off"
+        />
+
+        <button
+          type="submit"
+          id="addMissionButton"
+          class="button-50"
+        >
+          ADD!
+        </button>
+      </form>
+    </div>
+
+    <!-- Task kolonlari -->
+    <div class="tasks-section">
+      <section class="todo-section">
+        <h2>
+          <i class="bi bi-list-task" aria-hidden="true"></i>
+          To Do
+        </h2>
+        <ul id="todoList"></ul>
+      </section>
+
+      <section class="doing-section">
+        <h2>
+          <i class="bi bi-hourglass-split" aria-hidden="true"></i>
+          Doing
+        </h2>
+        <ul id="doingList"></ul>
+      </section>
+
+      <section class="done-section">
+        <h2>
+          <i class="bi bi-check2-circle" aria-hidden="true"></i>
+          Done
+        </h2>
+        <ul id="doneList"></ul>
+      </section>
+    </div>
+
+    <!-- Drag and drop modunda gorev silmek icin sayfanin altinda cop kutusu alani sunar. madeByCodex -->
+    <div
+      class="trash-drop-zone"
+      id="trashDropZone"
+      aria-hidden="true"
+    >
+      <i class="bi bi-trash3" aria-hidden="true"></i>
+      <span>Drop here to delete</span>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

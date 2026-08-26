@@ -1,0 +1,715 @@
+/* =========================
+   GENEL
+========================= */
+
+body {
+  font-family: "Open Sans", sans-serif;
+}
+
+/* Baslik alanini ve ayarlar ikonunu sayfanin iki ucuna yerlestirir. madeByCodex */
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.site-header h1 {
+  font-weight: 700;
+}
+
+/* Ayarlar ve kapatma ikonlarina ortak buton gorunumu kazandirir. madeByCodex */
+.settings-button,
+.close-settings-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: #111;
+  cursor: pointer;
+}
+
+.settings-button {
+  width: 2.75rem;
+  height: 2.75rem;
+  margin: 0.75rem 1rem 0 0;
+  font-size: 1.35rem;
+}
+
+.settings-button:hover,
+.settings-button:focus-visible,
+.close-settings-button:hover,
+.close-settings-button:focus-visible {
+  color: #2563eb;
+}
+
+/* Klavye kullaniminda ayarlar butonlarinin odaklandigini belirginlestirir. madeByCodex */
+.settings-button:focus-visible,
+.close-settings-button:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 3px;
+}
+
+/* Panel acildiginda sayfanin geri kalanini yarisaydam bir katmanla kapatir. madeByCodex */
+.settings-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: rgba(17, 24, 39, 0.2);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+/* Arka plan katmanini yalnizca panel acikken etkilesimli hale getirir. madeByCodex */
+.settings-overlay.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Ayarlar panelini ekranin saginda baslangicta gorunmez ve kompakt tutar. madeByCodex */
+.settings-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 11;
+  width: min(20rem, 86vw);
+  height: 100vh;
+  box-sizing: border-box;
+  padding: 1.25rem;
+  background: #fff;
+  box-shadow: -8px 0 24px rgba(17, 24, 39, 0.12);
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+}
+
+/* Panel acildiginda onu saga gizlenmis konumdan ekranin icine kaydirir. madeByCodex */
+.settings-panel.is-open {
+  transform: translateX(0);
+}
+
+/* Panel basligini ve kapatma ikonunu ayni satirda duzenler. madeByCodex */
+.settings-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 1rem;
+}
+
+/* Panel basliginin boyutunu ve agirligini ayarlar. madeByCodex */
+.settings-panel-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+/* Paneldeki kapatma ikonunun sabit boyutunu belirler. madeByCodex */
+.close-settings-button {
+  width: 2rem;
+  height: 2rem;
+  font-size: 1rem;
+}
+
+/* Henuz ayar eklenmedigini belirten yardimci metni stillendirir. madeByCodex */
+.settings-empty-state {
+  color: #6b7280;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* Gorev tasima seceneklerini panel icinde iki parcali switch govdesi olarak duzenler. madeByCodex */
+.mode-settings {
+  display: flex;
+  gap: 0;
+  margin: 1.8rem 0 0;
+  padding: 0.2rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.65rem;
+  background: #f3f4f6;
+}
+
+/* Switch basligini iki secenegin ustunde konumlandirir. madeByCodex */
+.mode-settings legend {
+  position: absolute;
+  transform: translateY(-1.5rem);
+  color: #111827;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+/* Radio kontrolunu gorunur arayuzden saklayip klavye erisimini korur. madeByCodex */
+.mode-option input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+/* Her modu switch icinde esit genislikte tiklanabilir bir bolum yapar. madeByCodex */
+.mode-option {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0.35rem 0.25rem;
+  border-radius: 0.45rem;
+  color: #6b7280;
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-align: center;
+  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Ikon ve metni switch seceneginin merkezinde dikey olarak hizalar. madeByCodex */
+.mode-option-content {
+  display: grid;
+  justify-items: center;
+  gap: 0.15rem;
+}
+
+/* Buttons secenegini kendi kolon renklerinden mavi tonuyla secili hale getirir. madeByCodex */
+.mode-option:has(input[value="buttons"]:checked) {
+  background: #dbeafe;
+  color: #2563eb;
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.2);
+}
+
+/* Drag and drop secenegini surec renginden turuncu tonuyla secili hale getirir. madeByCodex */
+.mode-option:has(input[value="dragdrop"]:checked) {
+  background: #fef3c7;
+  color: #d97706;
+  box-shadow: 0 1px 3px rgba(217, 119, 6, 0.2);
+}
+
+/* Gizli radio kontrolu klavyeyle secildiginde switch secenegini belirginlestirir. madeByCodex */
+.mode-option:has(input:focus-visible) {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+/* Focus secenegini switchten ayri ve panel icinde okunabilir bir ayar satiri olarak sunar. madeByCodex */
+.focus-setting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* Focus ayarinin ikonunu ve metnini ayni hizada tutar. madeByCodex */
+.focus-setting-copy {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: #374151;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* Focus ayarinin standart checkbox yerine kullanilacak switch govdesini hazirlar. madeByCodex */
+.toggle-control {
+  position: relative;
+  display: inline-flex;
+  width: 2.65rem;
+  height: 1.45rem;
+  cursor: pointer;
+}
+
+/* Checkbox kontrolunu switch gorunumunun arkasinda erisilebilir tutar. madeByCodex */
+.toggle-control input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+/* Focus switchinin kapali ve acik durumlarini animasyonlu ray olarak gosterir. madeByCodex */
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: #d1d5db;
+  transition: background-color 0.2s ease;
+}
+
+/* Switch topunu kapali durumda sola, acik durumda mavi tarafa yerlestirir. madeByCodex */
+.toggle-slider::before {
+  position: absolute;
+  top: 0.2rem;
+  left: 0.2rem;
+  width: 1.05rem;
+  height: 1.05rem;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(17, 24, 39, 0.25);
+  content: "";
+  transition: transform 0.2s ease;
+}
+
+/* Focus switchi acikken aktif rengi ve sagdaki top konumunu uygular. madeByCodex */
+.toggle-control input:checked + .toggle-slider {
+  background: #2563eb;
+}
+
+.toggle-control input:checked + .toggle-slider::before {
+  transform: translateX(1.2rem);
+}
+
+/* Klavye odaginda switchin secilebilir oldugunu gorunur hale getirir. madeByCodex */
+.toggle-control input:focus-visible + .toggle-slider {
+  outline: 2px solid #2563eb;
+  outline-offset: 3px;
+}
+
+/* Ekran okuyucular icin gerekli yardimci metni gorsel olarak gizler. madeByCodex */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Drag and drop modunda gorevlerin tasinabilir oldugunu imlec ile belirtir. madeByCodex */
+.tasks-section li[draggable="true"] {
+  cursor: grab;
+}
+
+/* Buton modunda gorevlerin suruklenebilir gorunmesini engeller. madeByCodex */
+.tasks-section li[draggable="false"] {
+  cursor: default;
+}
+
+/* Dokunmatik drag and drop sirasinda tarayicinin sayfayi kaydirmasini engeller. madeByCodex */
+.tasks-section li[draggable="true"] {
+  touch-action: none;
+}
+
+/* Cop kutusunu surukleme baslayana kadar gizli birakip alt kisimda animasyon icin hazirlar. madeByCodex */
+.trash-drop-zone {
+  position: fixed;
+  left: 50%;
+  bottom: 1.5rem;
+  z-index: 9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: min(18rem, calc(100% - 2rem));
+  min-height: 3.5rem;
+  box-sizing: border-box;
+  border: 2px dashed #dc2626;
+  background: #fff;
+  color: #dc2626;
+  font-size: 0.85rem;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translate(-50%, 1.5rem);
+  transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Drag and drop modu acikken cop kutusunun surukleme sirasinda kullanilabilmesini saglar. madeByCodex */
+.trash-drop-zone.is-enabled.is-visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translate(-50%, 0);
+}
+
+/* Gorev cop kutusunun uzerindeyken silme hedefini belirginlestirir. madeByCodex */
+.trash-drop-zone.is-drag-over {
+  background-color: rgba(220, 38, 38, 0.1);
+  color: #991b1b;
+}
+
+
+/* =========================
+   FORM YANI UST KISIM
+========================= */
+
+.form-container {
+  padding: 1rem;
+  font-size: 1.5rem;
+  margin-inline: 3rem;
+  margin-block: 3rem;
+}
+
+.addTodoMission {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  letter-spacing: 1.5px;
+  flex-wrap: wrap;
+}
+
+#addMission {
+  width: 12rem;
+  max-width: 100%;
+  padding: 0.6rem 1rem;
+  border-radius: 1rem;
+  border: 1px solid rgb(173, 173, 173);
+}
+
+#addMission:focus {
+  outline: none;
+  border-color: blue;
+  box-shadow: 0 0 0 3px rgba(0, 0, 255, 0.2);
+}
+
+
+/* =========================
+   ADD BUTTON
+========================= */
+
+.button-50 {
+  appearance: button;
+  background-color: #000;
+  background-image: none;
+  border: 1px solid #000;
+  border-radius: 4px;
+  box-shadow:
+    #fff 4px 4px 0 0,
+    #000 4px 4px 0 1px;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  font-family: "Open Sans", Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  margin: 0 5px 10px 0;
+  overflow: visible;
+  padding: 12px 40px;
+  text-align: center;
+  text-transform: none;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.button-50:focus,
+.button-50:hover {
+  text-decoration: none;
+}
+
+.button-50:active {
+  box-shadow: rgba(0, 0, 0, 0.125) 0 3px 5px inset;
+  outline: 0;
+}
+
+.button-50:not([disabled]):active {
+  box-shadow:
+    #fff 2px 2px 0 0,
+    #000 2px 2px 0 1px;
+  transform: translate(2px, 2px);
+}
+
+@media (min-width: 768px) {
+  .button-50 {
+    padding: 12px 50px;
+  }
+}
+
+
+/* =========================
+   TASK ALANI
+========================= */
+
+.tasks-section {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(2rem, 5vw, 5rem);
+  width: min(100% - 4rem, 68rem);
+  margin: 5.5rem auto 0;
+  text-align: left;
+}
+
+/* Kolonlar arasinda hafif bir ayirici kullanarak tablo hissini sakin ve duzenli tutar. madeByCodex */
+.tasks-section > section:not(:last-child) {
+  padding-right: clamp(1.25rem, 3vw, 2.5rem);
+  border-right: 1px solid #e5e7eb;
+}
+
+.tasks-section h2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 0 0 2.25rem;
+  font-size: 1.35rem;
+  font-weight: 500;
+  letter-spacing: 1.25px;
+  transition: opacity 0.2s ease, filter 0.2s ease;
+}
+
+.todo-section h2 i {
+  color: #2563eb;
+}
+
+.doing-section h2 i {
+  color: #d97706;
+}
+
+.done-section h2 i {
+  color: #16a34a;
+}
+
+.tasks-section ul {
+  /* Bos kolonlarin da suruklenen gorevleri kabul edebilecek gorunur alani olmasini saglar. madeByCodex */
+  min-height: 3rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tasks-section li {
+  position: relative;
+  margin-block: 1.35rem;
+  padding-inline: 0.35rem;
+  cursor: grab;
+  transition: opacity 0.2s ease, background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Suruklenen gorevi digerlerinden ayirarak hareket ettigini belli eder. madeByCodex */
+.tasks-section li.is-dragging {
+  opacity: 0.45;
+  cursor: grabbing;
+}
+
+/* Gorevin birakilabilecegi kolonu gecici olarak vurgular. madeByCodex */
+.tasks-section ul.is-drag-over {
+  background-color: rgba(37, 99, 235, 0.06);
+  outline: 2px dashed rgba(37, 99, 235, 0.45);
+  outline-offset: 0.35rem;
+}
+
+
+/* =========================
+   TASK ACTION BUTTONLARI
+========================= */
+
+.task-actions {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: max-content;
+  opacity: 0;
+  pointer-events: none;
+  margin-top: 0.4rem;
+  transform: translateX(-50%);
+  transition: opacity 0.2s ease;
+}
+
+/* Gorev uzerine gelindiginde butonlari liste akisina girmeden tiklanabilir yapar. madeByCodex */
+.tasks-section li:hover .task-actions,
+.tasks-section li.is-focused .task-actions {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Odaklanan gorevi one cikararak aksiyon butonlarinin ustte ve net kalmasini saglar. madeByCodex */
+.tasks-section li.is-focused {
+  --focus-color: #2563eb;
+  --focus-angle: 0deg;
+  width: calc(100% - 0.5rem);
+  min-height: 5.5rem;
+  box-sizing: border-box;
+  margin-inline: auto;
+  padding: 0.9rem 1rem 3.1rem;
+  border: 2px solid transparent;
+  border-radius: 0.5rem;
+  z-index: 4;
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    conic-gradient(
+      from var(--focus-angle),
+      transparent 0deg 85deg,
+      var(--focus-color) 125deg 205deg,
+      transparent 245deg 360deg
+    ) border-box;
+  box-shadow: 0 0.65rem 1.5rem rgba(17, 24, 39, 0.16), 0 0 1rem var(--focus-color);
+  transform: scale(1.04);
+  animation: focus-border-spin 3s linear infinite;
+}
+
+/* To Do odak kartinin hareketli kenar rengini maviye ayarlar. madeByCodex */
+.todo-section li.is-focused {
+  --focus-color: #2563eb;
+}
+
+/* Doing odak kartinin hareketli kenar rengini amber tonuna ayarlar. madeByCodex */
+.doing-section li.is-focused {
+  --focus-color: #d97706;
+}
+
+/* Done odak kartinin hareketli kenar rengini yesil tona ayarlar. madeByCodex */
+.done-section li.is-focused {
+  --focus-color: #16a34a;
+}
+
+/* Odak kartinin status rengiyle cevresinde donen yumusak bir parilti olusturur. madeByCodex */
+@property --focus-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+/* Odak kartinin renkli kenarini kesintisiz ve yavas bir donusle hareket ettirir. madeByCodex */
+@keyframes focus-border-spin {
+  to {
+    --focus-angle: 360deg;
+  }
+}
+
+/* Odaklanan gorevin aksiyonlarini genisleyen kutunun icinde alt bolume yerlestirir. madeByCodex */
+.tasks-section li.is-focused .task-actions {
+  top: auto;
+  bottom: 0.65rem;
+  width: calc(100% - 1rem);
+  margin-top: 0;
+}
+
+/* Buyuyen odak kartinda butonlari yatay alana sigacak sekilde dengeler. madeByCodex */
+.tasks-section li.is-focused .task-actions button {
+  flex: 1;
+  min-width: 0;
+  margin-inline: 0.12rem;
+  padding-inline: 0.3em;
+  font-size: 0.6rem;
+  letter-spacing: 1px;
+}
+
+/* Odaklanan gorev disindaki tasklari yumusakca geri plana iter. madeByCodex */
+body.task-focus-active .tasks-section li:not(.is-focused) {
+  opacity: 0.28;
+  filter: blur(1px);
+}
+
+/* Odaklanma sirasinda kolon basliklarini da geri plana alir. madeByCodex */
+body.task-focus-active .tasks-section h2 {
+  opacity: 0.35;
+  filter: blur(1.5px);
+}
+
+/* Odaklanma sirasinda sayfanin diger alanlarini soluklastirip hafif bulaniklastirir. madeByCodex */
+body.task-focus-active > :not(.tasks-section):not(.settings-panel):not(.settings-overlay):not(.trash-drop-zone) {
+  opacity: 0.35;
+  filter: blur(1.5px);
+}
+
+/* Odaklanan gorevin ve butonlarinin netligini korur. madeByCodex */
+body.task-focus-active .tasks-section li.is-focused,
+body.task-focus-active .tasks-section li.is-focused .task-actions {
+  opacity: 1;
+  filter: none;
+}
+
+.task-actions button {
+  font-family: "Open Sans", sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 2px;
+  text-decoration: none;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 3px solid;
+  padding: 0.25em 0.5em;
+  box-shadow:
+    1px 1px 0px 0px,
+    2px 2px 0px 0px,
+    3px 3px 0px 0px,
+    4px 4px 0px 0px,
+    5px 5px 0px 0px;
+  position: relative;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  margin-inline: 0.25rem;
+}
+
+.task-actions button:active {
+  box-shadow: 0 0 0 0;
+  top: 5px;
+  left: 5px;
+}
+
+/* Duruma gore renkler */
+.todo-btn {
+  color: #2563eb;
+}
+
+.doing-btn {
+  color: #d97706;
+}
+
+.done-btn {
+  color: #16a34a;
+}
+
+.delete-btn {
+  color: #dc2626;
+}
+
+@media (min-width: 768px) {
+  .task-actions button {
+    padding: 0.25em 0.75em;
+  }
+}
+
+/* Dar ekranlarda kolonlari alt alta al */
+@media (max-width: 700px) {
+  .tasks-section {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    width: calc(100% - 2rem);
+    margin-top: 3.5rem;
+    text-align: left;
+  }
+
+  /* Mobilde dikey kolonlar arasindaki ayiriciyi yatay cizgiye donusturur. madeByCodex */
+  .tasks-section > section:not(:last-child) {
+    padding-right: 0;
+    padding-bottom: 1.5rem;
+    border-right: 0;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .form-container {
+    margin-inline: 1rem;
+  }
+
+  /* Dokunmatik ekranlarda butonlari baslangicta gizli tutarak listeyi sade birakir. madeByCodex */
+  .tasks-section li:hover .task-actions {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Dokunulan veya klavyeyle odaklanan taskin butonlarini erisilebilir sekilde acar. madeByCodex */
+  .tasks-section li.is-focused .task-actions,
+  .tasks-section li:focus-within .task-actions {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Mobilde odaklanan task kartini ekran genisligine uyumlu tutar. madeByCodex */
+  .tasks-section li.is-focused {
+    width: calc(100% - 0.5rem);
+  }
+}
