@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ToDo List</title>
+    <title data-i18n="pageTitle">ToDo List</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -16,13 +16,13 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
     />
 
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css?v=20260901-3" />
   </head>
 
   <body>
     <!-- Sayfa basligiyla birlikte ayarlar butonunu sag ustte konumlandirir. madeByCodex -->
     <header class="site-header">
-      <h1>My Tasks</h1>
+      <h1 data-i18n="myTasks">My Tasks</h1>
       <button
         type="button"
         class="settings-button"
@@ -31,6 +31,8 @@
         aria-controls="settingsPanel"
         aria-expanded="false"
         title="Settings"
+        data-i18n-aria-label="openSettings"
+        data-i18n-title="settings"
       >
         <i class="bi bi-gear" aria-hidden="true"></i>
       </button>
@@ -44,35 +46,38 @@
       class="settings-panel"
       id="settingsPanel"
       aria-label="Settings"
+      data-i18n-aria-label="settings"
       aria-hidden="true"
     >
       <div class="settings-panel-header">
-        <h2>Settings</h2>
+        <h2 data-i18n="settings">Settings</h2>
         <button
           type="button"
           class="close-settings-button"
           id="closeSettingsButton"
           aria-label="Close settings"
           title="Close settings"
+          data-i18n-aria-label="closeSettings"
+          data-i18n-title="closeSettings"
         >
           <i class="bi bi-x-lg" aria-hidden="true"></i>
         </button>
       </div>
       <!-- Kullaniciya gorev tasima yontemlerinden birini renkli switch gorunumuyle secmesini saglar. madeByCodex -->
       <fieldset class="mode-settings">
-        <legend>Task movement</legend>
+        <legend data-i18n="taskMovement">Task movement</legend>
         <label class="mode-option">
           <input type="radio" name="interactionMode" value="buttons" checked />
           <span class="mode-option-content">
             <i class="bi bi-ui-checks-grid" aria-hidden="true"></i>
-            <span>Buttons</span>
+            <span data-i18n="buttons">Buttons</span>
           </span>
         </label>
         <label class="mode-option">
           <input type="radio" name="interactionMode" value="dragdrop" />
           <span class="mode-option-content">
             <i class="bi bi-hand-index" aria-hidden="true"></i>
-            <span>Drag &amp; Drop</span>
+            <span data-i18n="dragDrop">Drag &amp; Drop</span>
           </span>
         </label>
       </fieldset>
@@ -81,15 +86,474 @@
       <div class="focus-setting">
         <div class="focus-setting-copy">
           <i class="bi bi-crosshair2" aria-hidden="true"></i>
-          <span>Focus effect</span>
+          <span data-i18n="focusEffect">Focus effect</span>
         </div>
         <label class="toggle-control">
           <input type="checkbox" id="focusModeToggle" checked />
           <span class="toggle-slider" aria-hidden="true"></span>
-          <span class="visually-hidden">Toggle focus effect</span>
+          <span class="visually-hidden" data-i18n="toggleFocusEffect"
+            >Toggle focus effect</span
+          >
         </label>
       </div>
+      <section class="language-settings" id="languageSettings">
+        <button
+          type="button"
+          class="language-settings-toggle"
+          id="languageSettingsToggle"
+          aria-expanded="false"
+          aria-controls="languageSettingsContent"
+        >
+          <span class="language-settings-toggle-copy">
+            <i class="bi bi-translate" aria-hidden="true"></i>
+            <span>
+              <strong data-i18n="language">Language</strong>
+              <small id="activeLanguageName">English</small>
+            </span>
+          </span>
+          <i class="bi bi-chevron-down" aria-hidden="true"></i>
+        </button>
+        <div
+          class="language-settings-content"
+          id="languageSettingsContent"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="languageWorkspaceTitle"
+          hidden
+        >
+          <div class="language-dialog-header">
+            <div>
+              <span class="language-form-eyebrow" data-i18n="settings">Settings</span>
+              <h3 id="languageWorkspaceTitle" data-i18n="language">Language</h3>
+            </div>
+            <button
+              type="button"
+              class="language-dialog-close"
+              id="closeLanguageDialog"
+              aria-label="Close settings"
+              data-i18n-aria-label="closeSettings"
+            >
+              <i class="bi bi-x-lg" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div class="language-home" id="languageHome">
+            <div class="language-home-heading">
+              <div>
+                <h4 data-i18n="activeLanguage">Interface language</h4>
+                <p data-i18n="languageHelp">
+                  Choose the interface language or manage translations.
+                </p>
+              </div>
+              <div class="language-create-actions">
+                <button type="button" class="add-content-text-button" id="addContentTextButton">
+                  <i class="bi bi-type" aria-hidden="true"></i>
+                  <span data-i18n="addContentText">Add site text</span>
+                </button>
+                <button type="button" class="add-language-primary" id="addLanguageButton">
+                  <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                  <span data-i18n="addLanguage">Add language</span>
+                </button>
+              </div>
+            </div>
+            <select class="visually-hidden" id="languageSelect" tabindex="-1"></select>
+            <div class="language-cards" id="languageCards"></div>
+            <div class="language-home-actions">
+              <button type="button" id="editLanguageButton">
+                <i class="bi bi-pencil" aria-hidden="true"></i>
+                <span data-i18n="editTranslations">Edit translations</span>
+              </button>
+            </div>
+          </div>
+          <form class="new-language-form" id="newLanguageForm" hidden>
+            <button type="button" class="language-back-button" data-language-back>
+              <i class="bi bi-arrow-left" aria-hidden="true"></i>
+              <span data-i18n="backToLanguages">Back to languages</span>
+            </button>
+            <span class="language-form-eyebrow" data-i18n="newLanguage">New language</span>
+            <label for="newLanguageName" data-i18n="languageNameLabel">
+              Which language would you like to add?
+            </label>
+            <div class="new-language-name-row">
+              <input
+                id="newLanguageName"
+                type="text"
+                maxlength="40"
+                placeholder="e.g. French"
+                data-i18n-placeholder="languageNamePlaceholder"
+              />
+              <button type="submit" data-i18n="continue">Continue</button>
+            </div>
+            <p class="language-form-status" id="newLanguageStatus" aria-live="polite"></p>
+          </form>
+          <form class="translation-editor" id="translationEditor" hidden>
+            <button type="button" class="language-back-button" data-language-back>
+              <i class="bi bi-arrow-left" aria-hidden="true"></i>
+              <span data-i18n="backToLanguages">Back to languages</span>
+            </button>
+            <div class="translation-editor-heading">
+              <div>
+                <span class="language-form-eyebrow" data-i18n="translationEditor">Translation editor</span>
+                <strong id="translationLanguageName"></strong>
+              </div>
+              <small id="translationProgress"></small>
+            </div>
+            <p data-i18n="translationEditorHelp">
+              Use the English text as a guide and enter its translation.
+            </p>
+            <div class="translation-list" id="translationList"></div>
+            <div class="translation-editor-actions">
+              <button type="button" class="translation-cancel-button" data-language-back data-i18n="cancel">Cancel</button>
+              <button type="submit" class="translation-save-button" data-i18n="saveLanguage">Save language</button>
+            </div>
+            <p class="language-form-status" id="translationStatus" aria-live="polite"></p>
+          </form>
+          <form class="content-text-form" id="contentTextForm" hidden>
+            <button type="button" class="language-back-button" data-language-back>
+              <i class="bi bi-arrow-left" aria-hidden="true"></i>
+              <span data-i18n="backToLanguages">Back to languages</span>
+            </button>
+            <div class="content-text-heading">
+              <span class="language-form-eyebrow" data-i18n="newContentText">New site text</span>
+              <h4 data-i18n="addContentText">Add site text</h4>
+              <p data-i18n="contentTextHelp">
+                Add a new interface text and translate it for every language.
+              </p>
+            </div>
+            <div class="content-source-fields">
+              <label>
+                <span data-i18n="translationKey">Text key</span>
+                <input
+                  id="contentTextKey"
+                  type="text"
+                  maxlength="60"
+                  autocomplete="off"
+                  placeholder="e.g. archiveTask"
+                  data-i18n-placeholder="translationKeyPlaceholder"
+                />
+              </label>
+              <label>
+                <span data-i18n="englishText">English text</span>
+                <input
+                  id="contentEnglishText"
+                  type="text"
+                  maxlength="240"
+                  placeholder="e.g. Archive task"
+                  data-i18n-placeholder="englishTextPlaceholder"
+                />
+              </label>
+            </div>
+            <div class="content-translations-heading">
+              <strong data-i18n="translationsForLanguages">Translations for all languages</strong>
+              <small data-i18n="translationEditorHelp">Use the English text as a guide and enter its translation.</small>
+            </div>
+            <div class="content-language-inputs" id="contentLanguageInputs"></div>
+            <div class="translation-editor-actions">
+              <button type="button" class="translation-cancel-button" data-language-back data-i18n="cancel">Cancel</button>
+              <button type="submit" class="translation-save-button" data-i18n="saveContentText">Save site text</button>
+            </div>
+            <p class="language-form-status" id="contentTextStatus" aria-live="polite"></p>
+          </form>
+        </div>
+      </section>
     </aside>
+
+    <div class="task-extras-overlay" id="taskExtrasOverlay" aria-hidden="true">
+      <section
+        class="task-extras-modal"
+        id="taskExtrasModal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="taskExtrasTitle"
+      >
+        <div class="task-extras-header">
+          <div>
+            <span class="task-extras-eyebrow" data-i18n="taskExtras">Task extras</span>
+            <h2 id="taskExtrasTitle" data-i18n="taskDetails">Task details</h2>
+          </div>
+          <button
+            type="button"
+            class="close-settings-button"
+            id="closeTaskExtrasButton"
+            aria-label="Close task extras"
+            title="Close task extras"
+            data-i18n-aria-label="closeTaskExtras"
+            data-i18n-title="closeTaskExtras"
+          >
+            <i class="bi bi-x-lg" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="task-extras-home" id="taskExtrasHome">
+          <button type="button" class="task-extra-option" id="openTimerButton">
+            <span class="task-extra-option-icon"
+              ><i class="bi bi-stopwatch" aria-hidden="true"></i
+            ></span>
+            <span>
+              <strong data-i18n="timer">Timer</strong>
+              <small data-i18n="timerSummary">Set a countdown or a specific deadline.</small>
+            </span>
+            <i class="bi bi-arrow-right" aria-hidden="true"></i>
+          </button>
+          <button type="button" class="task-extra-option" id="openColorButton">
+            <span class="task-extra-option-icon task-color-option-icon"
+              ><i class="bi bi-palette" aria-hidden="true"></i
+            ></span>
+            <span>
+              <strong data-i18n="backgroundColor">Background color</strong>
+              <small data-i18n="backgroundColorSummary">Highlight or categorize this task.</small>
+            </span>
+            <i class="bi bi-arrow-right" aria-hidden="true"></i>
+          </button>
+          <button
+            type="button"
+            class="task-extra-option"
+            id="openDescriptionButton"
+          >
+            <span class="task-extra-option-icon task-description-option-icon"
+              ><i class="bi bi-card-text" aria-hidden="true"></i
+            ></span>
+            <span>
+              <strong data-i18n="description">Description</strong>
+              <small data-i18n="descriptionSummary">Add extra details or notes to this task.</small>
+            </span>
+            <i class="bi bi-arrow-right" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="task-timer-view" id="taskTimerView" hidden>
+          <div class="task-timer-view-header">
+            <button
+              type="button"
+              class="task-navigation-button"
+              id="backToExtrasButton"
+              aria-label="Back to task extras"
+              title="Back to task extras"
+            >
+              <i class="bi bi-arrow-left" aria-hidden="true"></i>
+            </button>
+            <div>
+              <span class="task-extras-eyebrow" data-i18n="timer">Timer</span>
+              <p data-i18n="timerHelp">Set a countdown for this task.</p>
+            </div>
+            <i
+              class="bi bi-stopwatch task-timer-view-icon"
+              aria-hidden="true"
+            ></i>
+          </div>
+          <form class="timer-form" id="timerForm">
+            <fieldset class="timer-mode">
+              <legend>Set by</legend>
+              <label>
+                <input type="radio" name="timerMode" value="duration" checked />
+                <span>Duration</span>
+              </label>
+              <label>
+                <input type="radio" name="timerMode" value="date" />
+                <span>Date &amp; time</span>
+              </label>
+            </fieldset>
+            <div class="timer-inputs">
+              <label>
+                <span>Days</span>
+                <input
+                  id="timerDays"
+                  type="number"
+                  min="0"
+                  max="365"
+                  value="0"
+                />
+              </label>
+              <label>
+                <span>Hours</span>
+                <input
+                  id="timerHours"
+                  type="number"
+                  min="0"
+                  max="23"
+                  value="0"
+                />
+              </label>
+              <label>
+                <span>Minutes</span>
+                <input
+                  id="timerMinutes"
+                  type="number"
+                  min="0"
+                  max="59"
+                  value="0"
+                />
+              </label>
+            </div>
+            <label class="timer-date-input">
+              <span>Ends at</span>
+              <input id="timerDate" type="date" />
+              <span class="timer-time-label">Time</span>
+              <div class="timer-time-inputs">
+                <select id="timerHour" aria-label="Hour"></select>
+                <span aria-hidden="true">:</span>
+                <select id="timerMinute" aria-label="Minute"></select>
+              </div>
+            </label>
+            <div class="timer-form-actions">
+              <button
+                type="button"
+                class="timer-clear-button"
+                id="clearTimerButton"
+              >
+                Clear
+              </button>
+              <button type="submit" class="timer-start-button">
+                <i class="bi bi-play-fill" aria-hidden="true"></i>
+                Start timer
+              </button>
+            </div>
+            <p class="timer-status" id="timerStatus" aria-live="polite"></p>
+          </form>
+        </div>
+        <div class="task-color-view" id="taskColorView" hidden>
+          <div class="task-timer-view-header">
+            <button
+              type="button"
+              class="task-navigation-button"
+              id="backFromColorButton"
+              aria-label="Back to task extras"
+              title="Back to task extras"
+            >
+              <i class="bi bi-arrow-left" aria-hidden="true"></i>
+            </button>
+            <div>
+              <span class="task-extras-eyebrow">Background color</span>
+              <p>Choose a color for this task.</p>
+            </div>
+            <i
+              class="bi bi-palette task-timer-view-icon"
+              aria-hidden="true"
+            ></i>
+          </div>
+          <div class="task-color-options">
+            <span class="task-extras-eyebrow">Presets</span>
+            <div
+              class="color-swatches"
+              role="group"
+              aria-label="Preset task colors"
+            >
+              <button
+                type="button"
+                class="color-swatch"
+                data-color="#ffffff"
+                style="--swatch-color: #ffffff"
+                aria-label="White"
+              ></button>
+              <button
+                type="button"
+                class="color-swatch"
+                data-color="#dbeafe"
+                style="--swatch-color: #dbeafe"
+                aria-label="Blue"
+              ></button>
+              <button
+                type="button"
+                class="color-swatch"
+                data-color="#fef3c7"
+                style="--swatch-color: #fef3c7"
+                aria-label="Yellow"
+              ></button>
+              <button
+                type="button"
+                class="color-swatch"
+                data-color="#dcfce7"
+                style="--swatch-color: #dcfce7"
+                aria-label="Green"
+              ></button>
+              <button
+                type="button"
+                class="color-swatch"
+                data-color="#fce7f3"
+                style="--swatch-color: #fce7f3"
+                aria-label="Pink"
+              ></button>
+              <button
+                type="button"
+                class="color-swatch"
+                data-color="#1f2937"
+                style="--swatch-color: #1f2937"
+                aria-label="Dark gray"
+              ></button>
+            </div>
+          </div>
+          <label class="custom-color-input">
+            <span>Custom color</span>
+            <input id="customTaskColor" type="color" value="#ffffff" />
+          </label>
+          <button
+            type="button"
+            class="clear-color-button"
+            id="clearColorButton"
+          >
+            <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+            Use default white
+          </button>
+        </div>
+        <div class="task-description-view" id="taskDescriptionView" hidden>
+          <div class="task-timer-view-header">
+            <button
+              type="button"
+              class="task-navigation-button"
+              id="backFromDescriptionButton"
+              aria-label="Back to task extras"
+              title="Back to task extras"
+            >
+              <i class="bi bi-arrow-left" aria-hidden="true"></i>
+            </button>
+            <div>
+              <span class="task-extras-eyebrow">Description</span>
+              <p>Add details that help explain this task.</p>
+            </div>
+            <i
+              class="bi bi-card-text task-timer-view-icon task-description-view-icon"
+              aria-hidden="true"
+            ></i>
+          </div>
+          <form class="description-form" id="descriptionForm">
+            <label class="visually-hidden" for="taskDescription"
+              >Task description</label
+            >
+            <div class="description-editor">
+              <textarea
+                id="taskDescription"
+                rows="7"
+                maxlength="1000"
+                placeholder="Write a few helpful details..."
+              ></textarea>
+              <div class="description-editor-meta">
+                <span class="description-writing-hint">
+                  <i class="bi bi-text-paragraph" aria-hidden="true"></i>
+                  Plain text
+                </span>
+                <span id="descriptionCharacterCount">0 / 1000</span>
+              </div>
+            </div>
+            <div class="description-form-actions">
+              <button
+                type="button"
+                class="description-clear-button"
+                id="clearDescriptionButton"
+              >
+                <i class="bi bi-trash3" aria-hidden="true"></i>
+                Remove
+              </button>
+              <button type="submit" class="description-save-button">
+                Save
+                <i class="bi bi-arrow-right" aria-hidden="true"></i>
+              </button>
+            </div>
+            <p
+              class="description-status"
+              id="descriptionStatus"
+              aria-live="polite"
+            ></p>
+          </form>
+        </div>
+      </section>
+    </div>
 
     <!-- Gorev ekleme kismi -->
     <div class="form-container">
@@ -103,11 +567,7 @@
           autocomplete="off"
         />
 
-        <button
-          type="submit"
-          id="addMissionButton"
-          class="button-50"
-        >
+        <button type="submit" id="addMissionButton" class="button-50">
           ADD!
         </button>
       </form>
@@ -141,15 +601,13 @@
     </div>
 
     <!-- Drag and drop modunda gorev silmek icin sayfanin altinda cop kutusu alani sunar. madeByCodex -->
-    <div
-      class="trash-drop-zone"
-      id="trashDropZone"
-      aria-hidden="true"
-    >
+    <div class="trash-drop-zone" id="trashDropZone" aria-hidden="true">
       <i class="bi bi-trash3" aria-hidden="true"></i>
       <span>Drop here to delete</span>
     </div>
 
-    <script src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="translations.js"></script>
+    <script src="script.js?v=20260901-2"></script>
   </body>
 </html>
