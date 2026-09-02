@@ -3,6 +3,22 @@ const todoForm = document.querySelector(".addTodoMission");
 
 // inputu buluyoruz tanimliyoruz
 const taskInput = document.getElementById("addMission");
+const addMissionButton = document.getElementById("addMissionButton");
+const taskImageInput = document.getElementById("taskImageInput");
+const taskImagePicker = document.getElementById("taskImagePicker");
+const taskImageDraft = document.getElementById("taskImageDraft");
+const taskImageDraftPreview = document.getElementById("taskImageDraftPreview");
+const taskImageDraftName = document.getElementById("taskImageDraftName");
+const taskImageDraftMeta = document.getElementById("taskImageDraftMeta");
+const removeTaskImageDraft = document.getElementById("removeTaskImageDraft");
+const taskImageStatus = document.getElementById("taskImageStatus");
+const taskImageDialog = document.getElementById("taskImageDialog");
+const taskImageDialogTitle = document.getElementById("taskImageDialogTitle");
+const taskImageDialogPreview = document.getElementById(
+  "taskImageDialogPreview",
+);
+const closeTaskImageDialog = document.getElementById("closeTaskImageDialog");
+const removeTaskImageButton = document.getElementById("removeTaskImageButton");
 
 // listeleri buluyoruz tanimliyoruz
 const todoList = document.getElementById("todoList");
@@ -22,15 +38,31 @@ const closeTaskExtrasButton = document.getElementById("closeTaskExtrasButton");
 const taskExtrasHome = document.getElementById("taskExtrasHome");
 const taskTimerView = document.getElementById("taskTimerView");
 const taskColorView = document.getElementById("taskColorView");
+const taskImageView = document.getElementById("taskImageView");
 const taskDescriptionView = document.getElementById("taskDescriptionView");
 const openTimerButton = document.getElementById("openTimerButton");
 const openColorButton = document.getElementById("openColorButton");
+const openImageButton = document.getElementById("openImageButton");
 const openDescriptionButton = document.getElementById("openDescriptionButton");
 const backToExtrasButton = document.getElementById("backToExtrasButton");
 const backFromColorButton = document.getElementById("backFromColorButton");
+const backFromImageButton = document.getElementById("backFromImageButton");
 const backFromDescriptionButton = document.getElementById(
   "backFromDescriptionButton",
 );
+const taskExtrasImageInput = document.getElementById("taskExtrasImageInput");
+const taskExtrasImagePicker = document.getElementById("taskExtrasImagePicker");
+const taskExtrasImagePreview = document.getElementById(
+  "taskExtrasImagePreview",
+);
+const taskExtrasImageEmpty = document.getElementById("taskExtrasImageEmpty");
+const replaceTaskExtrasImage = document.getElementById(
+  "replaceTaskExtrasImage",
+);
+const removeTaskExtrasImage = document.getElementById(
+  "removeTaskExtrasImage",
+);
+const taskExtrasImageStatus = document.getElementById("taskExtrasImageStatus");
 const timerForm = document.getElementById("timerForm");
 const timerDaysInput = document.getElementById("timerDays");
 const timerHoursInput = document.getElementById("timerHours");
@@ -53,8 +85,26 @@ const descriptionCharacterCount = document.getElementById(
   "descriptionCharacterCount",
 );
 const descriptionStatus = document.getElementById("descriptionStatus");
+const descriptionSaveButton = document.getElementById("descriptionSaveButton");
+const descriptionSaveButtonLabel = document.getElementById(
+  "descriptionSaveButtonLabel",
+);
+const descriptionTagPreview = document.getElementById("descriptionTagPreview");
+const descriptionTagList = document.getElementById("descriptionTagList");
+const taskSearchInput = document.getElementById("taskSearch");
+const clearTaskSearchButton = document.getElementById("clearTaskSearch");
+const taskSearchStatus = document.getElementById("taskSearchStatus");
+const filterImportantTasksButton = document.getElementById(
+  "filterImportantTasks",
+);
+const filterDueSoonTasksButton = document.getElementById("filterDueSoonTasks");
+const importantTaskCount = document.getElementById("importantTaskCount");
+const dueSoonTaskCount = document.getElementById("dueSoonTaskCount");
 const modeInputs = document.querySelectorAll('input[name="interactionMode"]');
 const focusModeToggle = document.getElementById("focusModeToggle");
+const themeToggle = document.getElementById("themeToggle");
+const themeValueLabel = document.getElementById("themeValueLabel");
+const themeSettingIcon = document.getElementById("themeSettingIcon");
 const languageSettingsToggle = document.getElementById("languageSettingsToggle");
 const languageSettingsContent = document.getElementById("languageSettingsContent");
 const activeLanguageName = document.getElementById("activeLanguageName");
@@ -110,6 +160,8 @@ function getLanguageStrings(languageCode = activeLanguage) {
     ...englishStrings,
     ...language.strings,
     ...(translationOverrides[languageCode] || {}),
+    // Proje adi ceviriden bagimsiz olarak her dilde ayni kalir.
+    myTasks: "Todoez",
   };
 }
 
@@ -142,9 +194,9 @@ const staticTranslationSelectors = {
   description: ["#taskDescriptionView .task-extras-eyebrow"],
   descriptionHelp: ["#taskDescriptionView .task-timer-view-header p"],
   taskDescription: ["label[for='taskDescription']"],
-  plainText: [".description-writing-hint"],
+  tagHint: [".description-writing-hint"],
   remove: ["#clearDescriptionButton"],
-  save: [".description-save-button"],
+  save: [".description-save-button-label"],
   addMissionLabel: ["label[for='addMission']"],
   add: ["#addMissionButton"],
   todo: [".todo-section h2"],
@@ -198,6 +250,7 @@ function applyTranslations() {
     button.title = translate("backToTaskExtras");
   });
   activeLanguageName.textContent = getLanguages()[activeLanguage].languageName;
+  updateThemeControls();
   if (activeTaskExtras) {
     taskExtrasTitle.textContent = activeTaskExtras.text;
   }
@@ -211,9 +264,190 @@ let interactionMode = localStorage.getItem(interactionModeKey) || "buttons";
 const focusModeKey = "focusModeEnabled";
 let isFocusModeEnabled = localStorage.getItem(focusModeKey) !== "false";
 focusModeToggle.checked = isFocusModeEnabled;
+
+const themeStorageKey = "todoezTheme";
+let activeTheme =
+  document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+
+function updateThemeControls() {
+  const isDark = activeTheme === "dark";
+  themeToggle.checked = isDark;
+  themeValueLabel.textContent = translate(isDark ? "darkTheme" : "lightTheme");
+  themeSettingIcon.className = isDark ? "bi bi-moon-stars-fill" : "bi bi-sun";
+}
+
+function setTheme(theme, shouldPersist = true) {
+  activeTheme = theme === "dark" ? "dark" : "light";
+  document.documentElement.dataset.theme = activeTheme;
+  document.documentElement.style.colorScheme = activeTheme;
+  if (shouldPersist) {
+    localStorage.setItem(themeStorageKey, activeTheme);
+  }
+  updateThemeControls();
+}
+
+const taskImageDatabaseName = "todoezAssets";
+const taskImageStoreName = "taskImages";
+const maxTaskImageSize = 5 * 1024 * 1024;
+const supportedTaskImageTypes = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+]);
+let taskImageDatabasePromise;
+let pendingTaskImage = null;
+let pendingTaskImageUrl = "";
+let activeTaskImageId = null;
+let activeTaskImageDialogUrl = "";
+let activeTaskExtrasImageUrl = "";
+const taskImageThumbnailUrls = new Set();
+
+function openTaskImageDatabase() {
+  if (!window.indexedDB) {
+    return Promise.reject(new Error("IndexedDB is not supported"));
+  }
+
+  if (!taskImageDatabasePromise) {
+    taskImageDatabasePromise = new Promise((resolve, reject) => {
+      const request = indexedDB.open(taskImageDatabaseName, 1);
+      request.onupgradeneeded = () => {
+        const database = request.result;
+        if (!database.objectStoreNames.contains(taskImageStoreName)) {
+          database.createObjectStore(taskImageStoreName, { keyPath: "taskId" });
+        }
+      };
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  return taskImageDatabasePromise;
+}
+
+async function saveTaskImage(taskId, file) {
+  const database = await openTaskImageDatabase();
+  return new Promise((resolve, reject) => {
+    const transaction = database.transaction(taskImageStoreName, "readwrite");
+    transaction.objectStore(taskImageStoreName).put({
+      taskId,
+      blob: file,
+      name: file.name,
+      type: file.type,
+      size: file.size,
+    });
+    transaction.oncomplete = resolve;
+    transaction.onerror = () => reject(transaction.error);
+    transaction.onabort = () => reject(transaction.error);
+  });
+}
+
+async function getTaskImage(taskId) {
+  const database = await openTaskImageDatabase();
+  return new Promise((resolve, reject) => {
+    const request = database
+      .transaction(taskImageStoreName, "readonly")
+      .objectStore(taskImageStoreName)
+      .get(taskId);
+    request.onsuccess = () => resolve(request.result || null);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function deleteTaskImage(taskId) {
+  try {
+    const database = await openTaskImageDatabase();
+    await new Promise((resolve, reject) => {
+      const transaction = database.transaction(taskImageStoreName, "readwrite");
+      transaction.objectStore(taskImageStoreName).delete(taskId);
+      transaction.oncomplete = resolve;
+      transaction.onerror = () => reject(transaction.error);
+      transaction.onabort = () => reject(transaction.error);
+    });
+  } catch (error) {
+    console.error("Task image could not be removed", error);
+  }
+}
+
+function formatImageSize(bytes) {
+  return bytes < 1024 * 1024
+    ? `${Math.max(1, Math.round(bytes / 1024))} KB`
+    : `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function clearTaskImageDraft() {
+  if (pendingTaskImageUrl) {
+    URL.revokeObjectURL(pendingTaskImageUrl);
+  }
+  pendingTaskImage = null;
+  pendingTaskImageUrl = "";
+  taskImageInput.value = "";
+  taskImageDraft.hidden = true;
+  taskImageDraftPreview.removeAttribute("src");
+  taskImagePicker.classList.remove("has-image");
+  taskImagePicker.setAttribute("aria-pressed", "false");
+}
+
+function selectTaskImage(file) {
+  taskImageStatus.textContent = "";
+
+  if (!file || !supportedTaskImageTypes.has(file.type)) {
+    taskImageStatus.textContent = translate("unsupportedImage");
+    return;
+  }
+
+  if (file.size > maxTaskImageSize) {
+    taskImageStatus.textContent = translate("imageTooLarge");
+    return;
+  }
+
+  clearTaskImageDraft();
+  pendingTaskImage = file;
+  pendingTaskImageUrl = URL.createObjectURL(file);
+  taskImageDraftPreview.src = pendingTaskImageUrl;
+  taskImageDraftName.textContent = file.name;
+  taskImageDraftMeta.textContent = formatImageSize(file.size);
+  taskImageDraft.hidden = false;
+  taskImagePicker.classList.add("has-image");
+  taskImagePicker.setAttribute("aria-pressed", "true");
+}
+
+function removeTask(taskId) {
+  tasks = tasks.filter((task) => task.id !== taskId);
+  deleteTaskImage(taskId);
+  saveTasks();
+  renderTasks();
+}
+
+function closeTaskImageViewer() {
+  if (taskImageDialog.open) {
+    taskImageDialog.close();
+  }
+  if (activeTaskImageDialogUrl) {
+    URL.revokeObjectURL(activeTaskImageDialogUrl);
+  }
+  activeTaskImageDialogUrl = "";
+  activeTaskImageId = null;
+  taskImageDialogPreview.removeAttribute("src");
+}
+
+function openTaskImageViewer(task, imageRecord) {
+  closeTaskImageViewer();
+  activeTaskImageId = task.id;
+  activeTaskImageDialogUrl = URL.createObjectURL(imageRecord.blob);
+  taskImageDialogTitle.textContent = task.text;
+  taskImageDialogPreview.src = activeTaskImageDialogUrl;
+  taskImageDialogPreview.alt = translate("taskImageAlt", { task: task.text });
+  taskImageDialog.showModal();
+  closeTaskImageDialog.focus();
+}
 let touchDragState = null;
 let activeTaskExtras = null;
 let timerInterval;
+let filterImportantTasks = false;
+let filterDueSoonTasks = false;
+let dueSoonTaskSignature = "";
+const dueSoonWindowMs = 24 * 60 * 60 * 1000;
 
 for (let hour = 0; hour < 24; hour += 1) {
   timerHourInput.add(new Option(String(hour).padStart(2, "0"), hour));
@@ -224,16 +458,21 @@ for (let minute = 0; minute < 60; minute += 1) {
 }
 
 function showTaskExtrasHome() {
+  releaseTaskExtrasImagePreview();
+  taskExtrasModal.scrollTop = 0;
   taskExtrasHome.hidden = false;
   taskTimerView.hidden = true;
   taskColorView.hidden = true;
+  taskImageView.hidden = true;
   taskDescriptionView.hidden = true;
 }
 
 function showTaskTimerView() {
+  taskExtrasModal.scrollTop = 0;
   taskExtrasHome.hidden = true;
   taskTimerView.hidden = false;
   taskColorView.hidden = true;
+  taskImageView.hidden = true;
   taskDescriptionView.hidden = true;
   const selectedMode = document.querySelector(
     'input[name="timerMode"]:checked',
@@ -242,24 +481,224 @@ function showTaskTimerView() {
 }
 
 function showTaskColorView() {
+  taskExtrasModal.scrollTop = 0;
   taskExtrasHome.hidden = true;
   taskTimerView.hidden = true;
   taskColorView.hidden = false;
+  taskImageView.hidden = true;
   taskDescriptionView.hidden = true;
   customTaskColorInput.focus();
 }
 
-function updateDescriptionCharacterCount() {
-  descriptionCharacterCount.textContent = `${taskDescriptionInput.value.length} / 1000`;
+function releaseTaskExtrasImagePreview() {
+  if (activeTaskExtrasImageUrl) {
+    URL.revokeObjectURL(activeTaskExtrasImageUrl);
+  }
+  activeTaskExtrasImageUrl = "";
+  taskExtrasImagePreview.removeAttribute("src");
 }
 
-function showTaskDescriptionView() {
+async function renderTaskExtrasImage(task) {
+  releaseTaskExtrasImagePreview();
+  taskExtrasImagePreview.hidden = true;
+  taskExtrasImageEmpty.hidden = false;
+  replaceTaskExtrasImage.hidden = true;
+  removeTaskExtrasImage.hidden = true;
+
+  if (!task?.hasImage) {
+    return;
+  }
+
+  try {
+    const imageRecord = await getTaskImage(task.id);
+    if (
+      !imageRecord ||
+      activeTaskExtras?.id !== task.id ||
+      taskImageView.hidden
+    ) {
+      return;
+    }
+    activeTaskExtrasImageUrl = URL.createObjectURL(imageRecord.blob);
+    taskExtrasImagePreview.src = activeTaskExtrasImageUrl;
+    taskExtrasImagePreview.alt = translate("taskImageAlt", { task: task.text });
+    taskExtrasImagePreview.hidden = false;
+    taskExtrasImageEmpty.hidden = true;
+    replaceTaskExtrasImage.hidden = false;
+    removeTaskExtrasImage.hidden = false;
+  } catch (error) {
+    console.error("Task extras image could not be loaded", error);
+    taskExtrasImageStatus.textContent = translate("imageLoadFailed");
+  }
+}
+
+function showTaskImageView() {
+  taskExtrasModal.scrollTop = 0;
   taskExtrasHome.hidden = true;
   taskTimerView.hidden = true;
   taskColorView.hidden = true;
+  taskImageView.hidden = false;
+  taskDescriptionView.hidden = true;
+  taskExtrasImageStatus.textContent = "";
+  taskExtrasImageInput.value = "";
+  renderTaskExtrasImage(activeTaskExtras);
+  taskExtrasImagePicker.focus();
+}
+
+// Aciklamadaki benzersiz #etiketleri Unicode karakterleri de destekleyerek cikarir.
+function extractTags(text = "") {
+  const tags = [];
+  const seenTags = new Set();
+  const tagPattern = /(^|[^\p{L}\p{N}_])#([\p{L}\p{N}_-]+)/gu;
+
+  for (const match of text.matchAll(tagPattern)) {
+    const tag = `#${match[2]}`;
+    const normalizedTag = normalizeSearchValue(tag);
+    if (!seenTags.has(normalizedTag)) {
+      seenTags.add(normalizedTag);
+      tags.push(tag);
+    }
+  }
+
+  return tags;
+}
+
+function renderTagChips(container, tags) {
+  container.replaceChildren();
+  tags.forEach((tag) => {
+    const chip = document.createElement("span");
+    chip.classList.add("task-tag");
+    chip.textContent = tag;
+    container.append(chip);
+  });
+}
+
+function updateDescriptionTagPreview() {
+  const tags = extractTags(taskDescriptionInput.value);
+  renderTagChips(descriptionTagList, tags);
+  descriptionTagPreview.hidden = tags.length === 0;
+}
+
+function updateDescriptionCharacterCount() {
+  descriptionCharacterCount.textContent = `${taskDescriptionInput.value.length} / 1000`;
+  updateDescriptionTagPreview();
+}
+
+function normalizeSearchValue(value) {
+  return activeLanguage === "tr"
+    ? value.toLocaleLowerCase("tr")
+    : value.toLocaleLowerCase();
+}
+
+// Normal kelimeleri baslik ve aciklamada, # ile baslayan sorgulari etiketlerde arar.
+function taskMatchesSearch(task, query) {
+  const searchTokens = query.trim().split(/\s+/u).filter(Boolean);
+  if (searchTokens.length === 0) {
+    return true;
+  }
+
+  const searchableText = normalizeSearchValue(
+    `${task.text || ""} ${task.description || ""} ${task.imageName || ""}`,
+  );
+  const normalizedTags = extractTags(task.description).map(normalizeSearchValue);
+
+  return searchTokens.every((token) => {
+    const normalizedToken = normalizeSearchValue(token);
+    if (normalizedToken.startsWith("#")) {
+      return normalizedTags.some((tag) => tag.startsWith(normalizedToken));
+    }
+    return searchableText.includes(normalizedToken);
+  });
+}
+
+function isTaskDueSoon(task) {
+  const remainingTime = Number(task.timerEndsAt) - Date.now();
+  return remainingTime > 0 && remainingTime <= dueSoonWindowMs;
+}
+
+function getDueSoonTaskSignature() {
+  return tasks
+    .filter(isTaskDueSoon)
+    .map((task) => String(task.id))
+    .sort()
+    .join(",");
+}
+
+function taskMatchesQuickFilters(task) {
+  return (
+    (!filterImportantTasks || task.important === true) &&
+    (!filterDueSoonTasks || isTaskDueSoon(task))
+  );
+}
+
+function updateQuickFilterControls() {
+  const importantCount = tasks.filter((task) => task.important === true).length;
+  const dueSoonCount = tasks.filter(isTaskDueSoon).length;
+
+  importantTaskCount.textContent = String(importantCount);
+  dueSoonTaskCount.textContent = String(dueSoonCount);
+  dueSoonTaskSignature = getDueSoonTaskSignature();
+  filterImportantTasksButton.classList.toggle(
+    "is-active",
+    filterImportantTasks,
+  );
+  filterDueSoonTasksButton.classList.toggle("is-active", filterDueSoonTasks);
+  filterImportantTasksButton.querySelector("i").className = filterImportantTasks
+    ? "bi bi-star-fill"
+    : "bi bi-star";
+  filterImportantTasksButton.setAttribute(
+    "aria-pressed",
+    String(filterImportantTasks),
+  );
+  filterDueSoonTasksButton.setAttribute(
+    "aria-pressed",
+    String(filterDueSoonTasks),
+  );
+}
+
+function updateTaskSearchStatus(visibleTaskCount) {
+  const hasQuery = Boolean(taskSearchInput.value.trim());
+  const hasActiveFilter = filterImportantTasks || filterDueSoonTasks;
+  clearTaskSearchButton.hidden = !hasQuery;
+  taskSearchStatus.textContent = hasQuery || hasActiveFilter
+    ? translate(
+        visibleTaskCount === 0 ? "noTasksFound" : "tasksFound",
+        { count: visibleTaskCount },
+      )
+    : "";
+}
+
+function showTaskDescriptionView() {
+  taskExtrasModal.scrollTop = 0;
+  taskExtrasHome.hidden = true;
+  taskTimerView.hidden = true;
+  taskColorView.hidden = true;
+  taskImageView.hidden = true;
   taskDescriptionView.hidden = false;
   descriptionStatus.textContent = "";
+  resetDescriptionSaveFeedback();
   taskDescriptionInput.focus();
+}
+
+let descriptionSaveFeedbackTimer;
+
+function resetDescriptionSaveFeedback() {
+  window.clearTimeout(descriptionSaveFeedbackTimer);
+  descriptionSaveButton.classList.remove("is-saved");
+  descriptionSaveButtonLabel.textContent = translate("save");
+}
+
+function showDescriptionSaveFeedback(messageKey) {
+  window.clearTimeout(descriptionSaveFeedbackTimer);
+  const message = translate(messageKey);
+
+  descriptionStatus.textContent = message;
+  descriptionSaveButtonLabel.textContent = message;
+  descriptionSaveButton.classList.add("is-saved");
+
+  descriptionSaveFeedbackTimer = window.setTimeout(() => {
+    descriptionSaveButton.classList.remove("is-saved");
+    descriptionSaveButtonLabel.textContent = translate("save");
+  }, 1800);
 }
 
 function getContrastTextColor(color) {
@@ -482,6 +921,15 @@ function updateTimerDisplays() {
         ? translate("noTimerSet")
         : translate("remaining", { time: formatTimer(seconds) });
   }
+
+  const currentDueSoonSignature = getDueSoonTaskSignature();
+  if (currentDueSoonSignature !== dueSoonTaskSignature) {
+    if (filterDueSoonTasks) {
+      renderTasks();
+    } else {
+      updateQuickFilterControls();
+    }
+  }
 }
 
 function startTimerUpdates() {
@@ -501,12 +949,92 @@ focusModeToggle.addEventListener("change", () => {
   localStorage.setItem(focusModeKey, String(isFocusModeEnabled));
 
   if (!isFocusModeEnabled) {
-    document.body.classList.remove("task-focus-active");
     document
       .querySelectorAll(".tasks-section li.is-focused")
       .forEach((task) => {
         task.classList.remove("is-focused");
       });
+  }
+});
+
+themeToggle.addEventListener("change", () => {
+  setTheme(themeToggle.checked ? "dark" : "light");
+});
+
+taskImagePicker.addEventListener("click", () => taskImageInput.click());
+taskImageInput.addEventListener("change", () => {
+  const [file] = taskImageInput.files;
+  if (file) {
+    selectTaskImage(file);
+  }
+});
+removeTaskImageDraft.addEventListener("click", () => {
+  clearTaskImageDraft();
+  taskImageStatus.textContent = "";
+  taskInput.focus();
+});
+
+taskInput.addEventListener("paste", (event) => {
+  const imageFile = Array.from(event.clipboardData?.files || []).find((file) =>
+    supportedTaskImageTypes.has(file.type),
+  );
+  if (imageFile) {
+    selectTaskImage(imageFile);
+  }
+});
+
+todoForm.addEventListener("dragover", (event) => {
+  const hasImage = Array.from(event.dataTransfer?.items || []).some(
+    (item) => item.kind === "file" && supportedTaskImageTypes.has(item.type),
+  );
+  if (hasImage) {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "copy";
+    todoForm.classList.add("is-image-drag-over");
+  }
+});
+
+todoForm.addEventListener("dragleave", (event) => {
+  if (!todoForm.contains(event.relatedTarget)) {
+    todoForm.classList.remove("is-image-drag-over");
+  }
+});
+
+todoForm.addEventListener("drop", (event) => {
+  todoForm.classList.remove("is-image-drag-over");
+  const imageFile = Array.from(event.dataTransfer?.files || []).find((file) =>
+    supportedTaskImageTypes.has(file.type),
+  );
+  if (imageFile) {
+    event.preventDefault();
+    selectTaskImage(imageFile);
+  }
+});
+
+closeTaskImageDialog.addEventListener("click", closeTaskImageViewer);
+taskImageDialog.addEventListener("cancel", (event) => {
+  event.preventDefault();
+  closeTaskImageViewer();
+});
+taskImageDialog.addEventListener("click", (event) => {
+  if (event.target === taskImageDialog) {
+    closeTaskImageViewer();
+  }
+});
+removeTaskImageButton.addEventListener("click", async () => {
+  const taskId = activeTaskImageId;
+  if (taskId === null) {
+    return;
+  }
+
+  closeTaskImageViewer();
+  await deleteTaskImage(taskId);
+  const task = tasks.find((item) => item.id === taskId);
+  if (task) {
+    delete task.hasImage;
+    delete task.imageName;
+    saveTasks();
+    renderTasks();
   }
 });
 
@@ -585,9 +1113,7 @@ function handleTrashDrop(e) {
   e.currentTarget.classList.remove("is-drag-over");
 
   const taskId = Number(e.dataTransfer.getData("text/plain"));
-  tasks = tasks.filter((task) => task.id !== taskId);
-  saveTasks();
-  renderTasks();
+  removeTask(taskId);
 }
 
 // Surukleme cop kutusundan ayrilinca gecici vurguyu kaldirir. madeByCodex
@@ -678,7 +1204,15 @@ function handleTouchPointerUp(e) {
 
   if (isDragging && dropTarget) {
     if (dropTarget.id === "trashDropZone") {
-      tasks = tasks.filter((currentTask) => currentTask.id !== task.id);
+      removeTask(task.id);
+      element.classList.remove("is-dragging");
+      document.querySelectorAll(".is-drag-over").forEach((dropZone) => {
+        dropZone.classList.remove("is-drag-over");
+      });
+      trashDropZone.classList.remove("is-visible", "is-drag-over");
+      trashDropZone.setAttribute("aria-hidden", "true");
+      touchDragState = null;
+      return;
     } else {
       task.status = dropTarget.id.replace("List", "");
     }
@@ -1007,6 +1541,7 @@ function setSettingsPanelOpen(isOpen) {
 function setTaskExtrasOpen(task) {
   const isOpen = Boolean(task);
   activeTaskExtras = task || null;
+  document.body.classList.toggle("task-extras-open", isOpen);
   taskExtrasOverlay.classList.toggle("is-open", isOpen);
   taskExtrasOverlay.setAttribute("aria-hidden", String(!isOpen));
 
@@ -1046,12 +1581,15 @@ function setTaskExtrasOpen(task) {
         { y: 0, scale: 1, opacity: 1, duration: 0.28, ease: "power2.out" },
       );
     }
+  } else {
+    releaseTaskExtrasImagePreview();
   }
 }
 
 // Secilen moda gore cop kutusunun kullanilabilirlik durumunu ayarlar. madeByCodex
 function updateModeInterface() {
   const isDragDropMode = interactionMode === "dragdrop";
+  document.body.dataset.interactionMode = interactionMode;
   trashDropZone.classList.toggle("is-enabled", isDragDropMode);
   trashDropZone.classList.remove("is-visible", "is-drag-over");
   trashDropZone.setAttribute("aria-hidden", "true");
@@ -1074,10 +1612,100 @@ document.addEventListener("keydown", (e) => {
 closeTaskExtrasButton.addEventListener("click", () => setTaskExtrasOpen(null));
 openTimerButton.addEventListener("click", showTaskTimerView);
 openColorButton.addEventListener("click", showTaskColorView);
+openImageButton.addEventListener("click", showTaskImageView);
 openDescriptionButton.addEventListener("click", showTaskDescriptionView);
 backToExtrasButton.addEventListener("click", showTaskExtrasHome);
 backFromColorButton.addEventListener("click", showTaskExtrasHome);
+backFromImageButton.addEventListener("click", showTaskExtrasHome);
 backFromDescriptionButton.addEventListener("click", showTaskExtrasHome);
+
+async function saveActiveTaskExtrasImage(file) {
+  taskExtrasImageStatus.textContent = "";
+
+  if (!file || !supportedTaskImageTypes.has(file.type)) {
+    taskExtrasImageStatus.textContent = translate("unsupportedImage");
+    return;
+  }
+  if (file.size > maxTaskImageSize) {
+    taskExtrasImageStatus.textContent = translate("imageTooLarge");
+    return;
+  }
+  if (!activeTaskExtras) {
+    return;
+  }
+
+  const task = activeTaskExtras;
+  taskExtrasImagePicker.disabled = true;
+  replaceTaskExtrasImage.disabled = true;
+  taskExtrasImageStatus.textContent = translate("savingImage");
+  try {
+    await saveTaskImage(task.id, file);
+    task.hasImage = true;
+    task.imageName = file.name;
+    saveTasks();
+    renderTasks();
+    await renderTaskExtrasImage(task);
+    taskExtrasImageStatus.textContent = translate("imageUpdated");
+  } catch (error) {
+    console.error("Task extras image could not be saved", error);
+    taskExtrasImageStatus.textContent = translate("imageSaveFailed");
+  } finally {
+    taskExtrasImagePicker.disabled = false;
+    replaceTaskExtrasImage.disabled = false;
+    taskExtrasImageInput.value = "";
+  }
+}
+
+taskExtrasImagePicker.addEventListener("click", () =>
+  taskExtrasImageInput.click(),
+);
+replaceTaskExtrasImage.addEventListener("click", () =>
+  taskExtrasImageInput.click(),
+);
+taskExtrasImageInput.addEventListener("change", () => {
+  const [file] = taskExtrasImageInput.files;
+  if (file) {
+    saveActiveTaskExtrasImage(file);
+  }
+});
+taskExtrasImagePicker.addEventListener("dragover", (event) => {
+  const hasImage = Array.from(event.dataTransfer?.items || []).some(
+    (item) => item.kind === "file" && supportedTaskImageTypes.has(item.type),
+  );
+  if (hasImage) {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "copy";
+    taskExtrasImagePicker.classList.add("is-drag-over");
+  }
+});
+taskExtrasImagePicker.addEventListener("dragleave", () => {
+  taskExtrasImagePicker.classList.remove("is-drag-over");
+});
+taskExtrasImagePicker.addEventListener("drop", (event) => {
+  taskExtrasImagePicker.classList.remove("is-drag-over");
+  const imageFile = Array.from(event.dataTransfer?.files || []).find((file) =>
+    supportedTaskImageTypes.has(file.type),
+  );
+  if (imageFile) {
+    event.preventDefault();
+    saveActiveTaskExtrasImage(imageFile);
+  }
+});
+removeTaskExtrasImage.addEventListener("click", async () => {
+  if (!activeTaskExtras) {
+    return;
+  }
+  const task = activeTaskExtras;
+  removeTaskExtrasImage.disabled = true;
+  await deleteTaskImage(task.id);
+  delete task.hasImage;
+  delete task.imageName;
+  saveTasks();
+  renderTasks();
+  await renderTaskExtrasImage(task);
+  taskExtrasImageStatus.textContent = translate("imageRemoved");
+  removeTaskExtrasImage.disabled = false;
+});
 colorSwatches.forEach((swatch) => {
   swatch.addEventListener("click", () => applyTaskColor(swatch.dataset.color));
 });
@@ -1085,7 +1713,25 @@ customTaskColorInput.addEventListener("input", () => {
   applyTaskColor(customTaskColorInput.value);
 });
 clearColorButton.addEventListener("click", () => applyTaskColor("#ffffff"));
-taskDescriptionInput.addEventListener("input", updateDescriptionCharacterCount);
+taskDescriptionInput.addEventListener("input", () => {
+  updateDescriptionCharacterCount();
+  descriptionStatus.textContent = "";
+  resetDescriptionSaveFeedback();
+});
+taskSearchInput.addEventListener("input", renderTasks);
+clearTaskSearchButton.addEventListener("click", () => {
+  taskSearchInput.value = "";
+  renderTasks();
+  taskSearchInput.focus();
+});
+filterImportantTasksButton.addEventListener("click", () => {
+  filterImportantTasks = !filterImportantTasks;
+  renderTasks();
+});
+filterDueSoonTasksButton.addEventListener("click", () => {
+  filterDueSoonTasks = !filterDueSoonTasks;
+  renderTasks();
+});
 descriptionForm.addEventListener("submit", (e) => {
   e.preventDefault();
 
@@ -1104,7 +1750,7 @@ descriptionForm.addEventListener("submit", (e) => {
   updateDescriptionCharacterCount();
   saveTasks();
   renderTasks();
-  descriptionStatus.textContent = translate(
+  showDescriptionSaveFeedback(
     description ? "descriptionSaved" : "descriptionRemoved",
   );
 });
@@ -1191,7 +1837,8 @@ taskExtrasOverlay.addEventListener("click", (e) => {
 });
 
 function renderTasks() {
-  document.body.classList.remove("task-focus-active");
+  taskImageThumbnailUrls.forEach((url) => URL.revokeObjectURL(url));
+  taskImageThumbnailUrls.clear();
   document
     .querySelectorAll(".tasks-section li.is-focused")
     .forEach((task) => task.classList.remove("is-focused"));
@@ -1200,7 +1847,13 @@ function renderTasks() {
   doingList.innerHTML = "";
   doneList.innerHTML = "";
 
-  tasks.forEach((task) => {
+  const filteredTasks = tasks.filter(
+    (task) =>
+      taskMatchesSearch(task, taskSearchInput.value) &&
+      taskMatchesQuickFilters(task),
+  );
+
+  filteredTasks.forEach((task) => {
     // Gorev satirini secilen moda gore suruklenebilir yapar veya pasiflestirir. madeByCodex
     const newTask = document.createElement("li");
     const isDragDropMode = interactionMode === "dragdrop";
@@ -1239,22 +1892,7 @@ function renderTasks() {
         }
 
         newTask.classList.add("is-focused");
-        document.body.classList.add("task-focus-active");
-
-        if (window.gsap) {
-          window.gsap.killTweensOf(newTask);
-          window.gsap.fromTo(
-            newTask,
-            { scale: 1, opacity: 0.9 },
-            {
-              scale: 1.04,
-              opacity: 1,
-              duration: 0.55,
-              ease: "power2.out",
-            },
-          );
-        }
-      }, 1200);
+      }, 450);
     });
 
     // Gorevden ayrilinca bekleyen zamanlayiciyi ve odak gorunumunu temizler. madeByCodex
@@ -1266,39 +1904,19 @@ function renderTasks() {
         }
 
         newTask.classList.remove("is-focused");
-
-        if (window.gsap) {
-          window.gsap.killTweensOf(newTask);
-          window.gsap.to(newTask, {
-            scale: 1,
-            opacity: 1,
-            duration: 0.3,
-            ease: "power2.out",
-            clearProps: "transform,opacity",
-          });
-        }
-
-        if (!document.querySelector(".tasks-section li.is-focused")) {
-          document.body.classList.remove("task-focus-active");
-        }
-      }, 150);
+      }, 90);
     });
 
     // Klavye veya ekran okuyucu kullanicisi taska geldiginde odak gorunumunu etkinlestirir. madeByCodex
     newTask.addEventListener("focus", () => {
       if (interactionMode === "buttons" && isFocusModeEnabled) {
         newTask.classList.add("is-focused");
-        document.body.classList.add("task-focus-active");
       }
     });
 
-    // Klavye odağı tasktan ayrilinca odak gorunumunu ve sayfa etkisini temizler. madeByCodex
+    // Klavye odagi tasktan ayrilinca yumusak odak gorunumunu temizler. madeByCodex
     newTask.addEventListener("blur", () => {
       newTask.classList.remove("is-focused");
-
-      if (!document.querySelector(".tasks-section li.is-focused")) {
-        document.body.classList.remove("task-focus-active");
-      }
     });
 
     // Dokunmatik cihazlarda gorevin kolonlar arasinda suruklenmesini saglar. madeByCodex
@@ -1319,6 +1937,59 @@ function renderTasks() {
     taskInfo.classList.add("task-info");
     taskInfo.append(taskText);
 
+    const taskContent = document.createElement("div");
+    taskContent.classList.add("task-content");
+
+    if (task.hasImage) {
+      newTask.classList.add("has-image");
+      const imageButton = document.createElement("button");
+      const imagePreview = document.createElement("img");
+      const imageZoomIcon = document.createElement("i");
+      imageButton.type = "button";
+      imageButton.classList.add("task-image-thumbnail");
+      imageButton.disabled = true;
+      imageButton.draggable = false;
+      imageButton.setAttribute(
+        "aria-label",
+        translate("viewTaskImage", { task: task.text }),
+      );
+      imagePreview.alt = "";
+      imagePreview.loading = "lazy";
+      imagePreview.draggable = false;
+      imageZoomIcon.className = "bi bi-arrows-fullscreen";
+      imageZoomIcon.setAttribute("aria-hidden", "true");
+      imageButton.append(imagePreview, imageZoomIcon);
+      imageButton.addEventListener("pointerdown", (event) => {
+        event.stopPropagation();
+      });
+      taskContent.append(imageButton);
+
+      getTaskImage(task.id)
+        .then((imageRecord) => {
+          if (!imageButton.isConnected) {
+            return;
+          }
+          if (!imageRecord) {
+            imageButton.remove();
+            newTask.classList.remove("has-image");
+            return;
+          }
+          const imageUrl = URL.createObjectURL(imageRecord.blob);
+          taskImageThumbnailUrls.add(imageUrl);
+          imagePreview.src = imageUrl;
+          imageButton.disabled = false;
+          imageButton.addEventListener("click", (event) => {
+            event.stopPropagation();
+            openTaskImageViewer(task, imageRecord);
+          });
+        })
+        .catch((error) => {
+          console.error("Task image could not be loaded", error);
+        });
+    }
+
+    taskContent.append(taskInfo);
+
     if (task.timerEndsAt) {
       const timerDisplay = document.createElement("span");
       timerDisplay.classList.add("task-timer");
@@ -1330,30 +2001,80 @@ function renderTasks() {
 
     const importanceButton = document.createElement("button");
     const taskExtrasButton = document.createElement("button");
+    let taskDescriptionButton = null;
     const isImportant = task.important === true;
     const hasDescription = Boolean(task.description?.trim());
     taskExtrasButton.type = "button";
     taskExtrasButton.classList.add("task-extras-button");
-    taskExtrasButton.setAttribute(
-      "aria-label",
-      translate(hasDescription ? "descriptionAdded" : "openTaskExtras"),
-    );
-    taskExtrasButton.title = hasDescription
-      ? "Task extras · Description added"
-      : "Task extras";
-    taskExtrasButton.innerHTML = hasDescription
-      ? '<i class="bi bi-file-earmark-text-fill" aria-hidden="true"></i>'
-      : '<i class="bi bi-plus-lg" aria-hidden="true"></i>';
-    taskExtrasButton.title = translate(
-      hasDescription ? "taskExtrasDescriptionTitle" : "taskExtrasTitle",
-    );
-    if (hasDescription) {
-      taskExtrasButton.classList.add("has-description");
-    }
+    taskExtrasButton.setAttribute("aria-label", translate("openTaskExtras"));
+    taskExtrasButton.title = translate("taskExtrasTitle");
+    taskExtrasButton.innerHTML =
+      '<i class="bi bi-plus-lg" aria-hidden="true"></i>';
     taskExtrasButton.addEventListener("click", (e) => {
       e.stopPropagation();
       setTaskExtrasOpen(task);
     });
+
+    if (hasDescription) {
+      newTask.classList.add("has-description");
+      taskDescriptionButton = document.createElement("button");
+      taskDescriptionButton.type = "button";
+      taskDescriptionButton.classList.add("task-description-button");
+      taskDescriptionButton.setAttribute(
+        "aria-label",
+        translate("editDescription"),
+      );
+      taskDescriptionButton.innerHTML =
+        '<i class="bi bi-file-earmark-text-fill" aria-hidden="true"></i>';
+
+      const descriptionPreview = document.createElement("span");
+      const previewId = `task-description-preview-${task.id}`;
+      descriptionPreview.id = previewId;
+      descriptionPreview.classList.add("task-description-preview");
+      descriptionPreview.setAttribute("role", "tooltip");
+
+      const previewHeading = document.createElement("span");
+      previewHeading.classList.add("task-description-preview-heading");
+      const previewIcon = document.createElement("i");
+      previewIcon.className = "bi bi-card-text";
+      previewIcon.setAttribute("aria-hidden", "true");
+      const previewLabel = document.createElement("span");
+      previewLabel.textContent = translate("description");
+      previewHeading.append(previewIcon, previewLabel);
+
+      const previewText = document.createElement("span");
+      previewText.classList.add("task-description-preview-text");
+      previewText.textContent = task.description.trim();
+
+      const taskTags = extractTags(task.description);
+      const previewTags = document.createElement("span");
+      previewTags.classList.add("task-description-preview-tags", "task-tag-list");
+      renderTagChips(previewTags, taskTags);
+      previewTags.hidden = taskTags.length === 0;
+
+      const previewAction = document.createElement("span");
+      previewAction.classList.add("task-description-preview-action");
+      const previewActionText = document.createElement("span");
+      previewActionText.textContent = translate("editDescription");
+      const previewActionIcon = document.createElement("i");
+      previewActionIcon.className = "bi bi-arrow-right";
+      previewActionIcon.setAttribute("aria-hidden", "true");
+      previewAction.append(previewActionText, previewActionIcon);
+
+      descriptionPreview.append(
+        previewHeading,
+        previewText,
+        previewTags,
+        previewAction,
+      );
+      taskDescriptionButton.append(descriptionPreview);
+      taskDescriptionButton.setAttribute("aria-describedby", previewId);
+      taskDescriptionButton.addEventListener("click", (e) => {
+        e.stopPropagation();
+        setTaskExtrasOpen(task);
+        showTaskDescriptionView();
+      });
+    }
 
     importanceButton.type = "button";
     importanceButton.classList.add("importance-button");
@@ -1441,9 +2162,7 @@ function renderTasks() {
     setActionButtonColor(deleteButton, "delete");
 
     deleteButton.addEventListener("click", () => {
-      tasks = tasks.filter((t) => t.id !== task.id);
-      saveTasks();
-      renderTasks();
+      removeTask(task.id);
     });
 
     // Buton modunda durum degistirme ve silme butonlarini gorunur tutar. madeByCodex
@@ -1458,7 +2177,11 @@ function renderTasks() {
       taskActions.append(deleteButton);
     }
 
-    newTask.append(taskInfo, taskExtrasButton, importanceButton, taskActions);
+    newTask.append(taskContent, taskExtrasButton);
+    if (taskDescriptionButton) {
+      newTask.append(taskDescriptionButton);
+    }
+    newTask.append(importanceButton, taskActions);
 
     // Task'i statusune gore dogru listeye basiyoruz
     if (task.status === "todo") {
@@ -1469,6 +2192,9 @@ function renderTasks() {
       doneList.append(newTask);
     }
   });
+
+  updateQuickFilterControls();
+  updateTaskSearchStatus(filteredTasks.length);
 }
 
 // Sayfa yuklendiginde secili moda ait arayuz elemanlarini hazirlar. madeByCodex
@@ -1491,7 +2217,7 @@ if (window.location.hash.startsWith("#language-settings")) {
   }
 }
 
-todoForm.addEventListener("submit", function (e) {
+todoForm.addEventListener("submit", async function (e) {
   e.preventDefault();
 
   const taskText = taskInput.value.trim();
@@ -1507,11 +2233,33 @@ todoForm.addEventListener("submit", function (e) {
     important: false,
   };
 
+  const taskImage = pendingTaskImage;
+  if (taskImage) {
+    addMissionButton.disabled = true;
+    taskImagePicker.disabled = true;
+    taskImageStatus.textContent = translate("savingImage");
+    try {
+      await saveTaskImage(task.id, taskImage);
+      task.hasImage = true;
+      task.imageName = taskImage.name;
+    } catch (error) {
+      console.error("Task image could not be saved", error);
+      taskImageStatus.textContent = translate("imageSaveFailed");
+      addMissionButton.disabled = false;
+      taskImagePicker.disabled = false;
+      return;
+    }
+  }
+
   tasks.push(task);
 
   saveTasks();
   renderTasks();
 
   taskInput.value = "";
+  clearTaskImageDraft();
+  taskImageStatus.textContent = "";
+  addMissionButton.disabled = false;
+  taskImagePicker.disabled = false;
   taskInput.focus();
 });
